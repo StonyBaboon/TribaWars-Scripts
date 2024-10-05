@@ -1,40 +1,12 @@
 var scriptConfig = {
     scriptData: {
-        prefix: 'scriptsPack',
+        prefix: 'pacoteDeScripts',
         name: `Pacote de Scripts do RedAlert`,
         version: 'v1.3.9',
         author: 'RedAlert',
         authorUrl: 'https://twscripts.dev/',
         helpLink:
             'https://forum.tribalwars.net/index.php?threads/redalerts-scripts-pack.287832/',
-    },
-    translations: {
-        pt: {
-            "RedAlert's Scripts Pack": "Pacote de Scripts do RedAlert",
-            Help: 'Ajuda',
-            'There was an error!': 'Ocorreu um erro!',
-            'There are no scripts!': 'Não há scripts!',
-            'There has been an error fetching the scripts!':
-                'Ocorreu um erro ao buscar os scripts!',
-            'scripts listed': 'scripts listados',
-            'Script Name': 'Nome do Script',
-            'Script Loader': 'Carregador de Script',
-            Forum: 'Fórum',
-            Demo: 'Demonstração',
-            New: 'Novo',
-            'Search scripts ...': 'Pesquisar scripts ...',
-            'Fetching scripts ...': 'Buscando scripts ...',
-            'Script is not allowed to be used on this TW market!':
-                'O script não pode ser usado neste mercado do TW!',
-            NEW: 'NOVO',
-            ALL: 'TODOS',
-            Add: 'Adicionar',
-            'Quick-bar item has been added!': 'Item adicionado à barra rápida!',
-            'Go to forum': 'Ir para o fórum',
-            'View demo video': 'Ver vídeo de demonstração',
-            'Add script on Quick-bar': 'Adicionar script na barra rápida',
-            'This script has no demo video!': 'Este script não possui vídeo de demonstração!',
-        },
     },
     allowedMarkets: ['en', 'us', 'yy', 'pt', 'fr', 'br', 'de'],
     allowedScreens: [],
@@ -51,46 +23,44 @@ $.getScript(
         const scriptInfo = twSDK.scriptInfo();
         const isValidMarket = twSDK.checkValidMarket();
 
-        // verificar se estamos em um mercado válido
+        // Verificar se estamos em um mercado válido
         if (!isValidMarket) {
-            UI.ErrorMessage(
-                twSDK.tt('O script não pode ser usado neste mercado do TW!')
-            );
+            UI.ErrorMessage('O script não pode ser usado neste mercado do TW!');
             return;
         }
 
         // Ponto de Entrada
         (async function () {
             try {
-                const scripts = await fetchScripts();
+                const scripts = await buscarScripts();
 
                 if (DEBUG) {
                     console.debug(`${scriptInfo} scripts`, scripts);
                 }
 
                 if (scripts.length) {
-                    // construir a interface do usuário
-                    buildUI(scripts);
+                    // Construir a interface do usuário
+                    construirInterface(scripts);
 
-                    // registrar manipuladores de eventos
-                    handleOnChangeSearchScripts(scripts);
-                    handleFilterByCategory(scripts);
-                    handleAddToQuickBar();
-                    handleViewVideo();
+                    // Registrar manipuladores de eventos
+                    manipularMudancaPesquisa(scripts);
+                    manipularFiltroPorCategoria(scripts);
+                    manipularAdicionarBarraRapida();
+                    manipularVerVideo();
                 } else {
-                    UI.ErrorMessage(twSDK.tt('Não há scripts!'));
+                    UI.ErrorMessage('Não há scripts!');
                 }
             } catch (error) {
-                UI.ErrorMessage(twSDK.tt('Ocorreu um erro!'));
-                console.error(`${scriptInfo} Error:`, error);
+                UI.ErrorMessage('Ocorreu um erro!');
+                console.error(`${scriptInfo} Erro:`, error);
             }
         })();
 
         // Renderizar: Construir interface do usuário
-        function buildUI(scripts) {
-            const content = prepareContent(scripts);
+        function construirInterface(scripts) {
+            const conteudo = prepararConteudo(scripts);
 
-            const customStyle = `
+            const estiloPersonalizado = `
                 .ra-textarea { height: 45px; }
                 .ra-external-icon-link { font-size: 16px; }
                 .new-script-tag { background-color: #21881e; color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 3px; }
@@ -109,228 +79,222 @@ $.getScript(
             `;
 
             twSDK.renderBoxWidget(
-                content,
-                'raScriptsPack',
-                'ra-scripts-pack',
-                customStyle
+                conteudo,
+                'pacoteDeScriptsRedAlert',
+                'pacote-de-scripts-redalert',
+                estiloPersonalizado
             );
         }
 
         // Manipulador de Ação: Ao alterar o valor do input
-        function handleOnChangeSearchScripts(scripts) {
-            jQuery('#searchScripts').on('input', function (event) {
+        function manipularMudancaPesquisa(scripts) {
+            jQuery('#pesquisarScripts').on('input', function (event) {
                 const { value } = event.target;
-                const remainingScripts = filterByValue(scripts, value.trim());
-                if (remainingScripts.length) {
-                    updateUIElements(remainingScripts);
+                const scriptsRestantes = filtrarPorValor(scripts, value.trim());
+                if (scriptsRestantes.length) {
+                    atualizarElementosUI(scriptsRestantes);
                 }
 
-                handleViewVideo();
-                handleAddToQuickBar();
+                manipularVerVideo();
+                manipularAdicionarBarraRapida();
             });
         }
 
         // Manipulador de Ação: Filtrar scripts por categoria
-        function handleFilterByCategory(scripts) {
+        function manipularFiltroPorCategoria(scripts) {
             jQuery('.ra-category-filter').on('click', function (e) {
                 e.preventDefault();
 
                 jQuery('.ra-category-filter').removeClass('btn-confirm-yes');
                 jQuery(this).addClass('btn-confirm-yes');
 
-                const chosenCategory = jQuery(this)
+                const categoriaEscolhida = jQuery(this)
                     .attr('data-category-filter')
                     .trim();
 
-                if (chosenCategory !== 'new' && chosenCategory !== 'all') {
-                    const filteredScripts = scripts.filter((script) => {
-                        const { categories } = script;
-                        return categories.includes(chosenCategory);
+                if (categoriaEscolhida !== 'novo' && categoriaEscolhida !== 'todos') {
+                    const scriptsFiltrados = scripts.filter((script) => {
+                        const { categorias } = script;
+                        return categorias.includes(categoriaEscolhida);
                     });
 
-                    if (filteredScripts.length) {
-                        updateUIElements(filteredScripts);
+                    if (scriptsFiltrados.length) {
+                        atualizarElementosUI(scriptsFiltrados);
                     }
                 } else {
-                    if (chosenCategory === 'all') {
-                        updateUIElements(scripts);
+                    if (categoriaEscolhida === 'todos') {
+                        atualizarElementosUI(scripts);
                     }
-                    if (chosenCategory === 'new') {
-                        const newScripts = getNewScripts(scripts);
-                        updateUIElements(newScripts);
+                    if (categoriaEscolhida === 'novo') {
+                        const scriptsNovos = obterScriptsNovos(scripts);
+                        atualizarElementosUI(scriptsNovos);
                     }
                 }
 
-                handleViewVideo();
-                handleAddToQuickBar();
+                manipularVerVideo();
+                manipularAdicionarBarraRapida();
             });
         }
 
         // Manipulador de Ação: Adicionar script à barra rápida
-        function handleAddToQuickBar() {
-            jQuery('.add-to-quick-bar').on('click', function (e) {
+        function manipularAdicionarBarraRapida() {
+            jQuery('.adicionar-barra-rapida').on('click', function (e) {
                 e.preventDefault();
 
-                let selectedScript = jQuery(this)
+                let scriptSelecionado = jQuery(this)
                     .parent()
                     .parent()
                     .find('.ra-textarea')
                     .text()
                     .trim();
-                let selectedScriptName = jQuery(this)
+                let nomeScriptSelecionado = jQuery(this)
                     .parent()
                     .parent()
                     .find('.ra-script-title')
                     .attr('data-camelize')
                     .trim();
 
-                let scriptData = `hotkey=&name=${selectedScriptName}&href=${encodeURI(
-                    selectedScript
+                let dadosScript = `hotkey=&name=${nomeScriptSelecionado}&href=${encodeURI(
+                    scriptSelecionado
                 )}`;
-                let action =
+                let acao =
                     '/game.php?screen=settings&mode=quickbar_edit&action=quickbar_edit&';
 
                 jQuery.ajax({
-                    url: action,
+                    url: acao,
                     type: 'POST',
-                    data: scriptData + `&h=${csrf_token}`,
+                    data: dadosScript + `&h=${csrf_token}`,
                 });
-                UI.SuccessMessage(twSDK.tt('Item adicionado à barra rápida!'));
+                UI.SuccessMessage('Item adicionado à barra rápida!');
             });
         }
 
         // Manipulador de Ação: Ver vídeo
-        function handleViewVideo() {
-            jQuery('.ra-view-video').on('click', function (e) {
+        function manipularVerVideo() {
+            jQuery('.ra-ver-video').on('click', function (e) {
                 e.preventDefault();
 
-                let selectedScriptVideo = jQuery(this).attr('href');
-                selectedScriptVideo = selectedScriptVideo.split('=')[1];
+                let videoScriptSelecionado = jQuery(this).attr('href');
+                videoScriptSelecionado = videoScriptSelecionado.split('=')[1];
 
-                if (selectedScriptVideo) {
-                    let content = `<iframe width="768" height="480" src="https://www.youtube-nocookie.com/embed/${selectedScriptVideo}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-                    Dialog.show('content', content);
+                if (videoScriptSelecionado) {
+                    let conteudo = `<iframe width="768" height="480" src="https://www.youtube-nocookie.com/embed/${videoScriptSelecionado}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+                    Dialog.show('conteudo', conteudo);
                 } else {
-                    UI.ErrorMessage(twSDK.tt('Este script não possui vídeo de demonstração!'));
+                    UI.ErrorMessage('Este script não possui vídeo de demonstração!');
                 }
             });
         }
 
         // Helper: Converter string para camelCase
-        function camelize(str) {
+        function camelizar(str) {
             return str
-                .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
-                    return index === 0
-                        ? word.toLowerCase()
-                        : word.toUpperCase();
+                .replace(/(?:^\w|[A-Z]|\b\w)/g, function (palavra, indice) {
+                    return indice === 0
+                        ? palavra.toLowerCase()
+                        : palavra.toUpperCase();
                 })
                 .replace(/\s+/g, '');
         }
 
         // Helper: Atualizar elementos da UI após interação
-        function updateUIElements(scriptsArray) {
-            const tableRows = buildTableRows(scriptsArray);
-            jQuery('#raScriptsCount').text(scriptsArray.length);
-            jQuery('#scriptsList').html(tableRows);
+        function atualizarElementosUI(scriptsArray) {
+            const linhasTabela = construirLinhasTabela(scriptsArray);
+            jQuery('#raContagemScripts').text(scriptsArray.length);
+            jQuery('#listaScripts').html(linhasTabela);
         }
 
         // Helper: Obter novos scripts
-        function getNewScripts(scripts) {
-            const newScripts = scripts.filter((script) => {
-                const { date_published } = script;
-                const approvedDate = Date.parse(date_published);
-                if (isNewScriptCheck(approvedDate)) {
+        function obterScriptsNovos(scripts) {
+            const novosScripts = scripts.filter((script) => {
+                const { data_publicacao } = script;
+                const dataAprovada = Date.parse(data_publicacao);
+                if (verificarScriptNovo(dataAprovada)) {
                     return script;
                 }
             });
 
-            return newScripts;
+            return novosScripts;
         }
 
         // Helper: Filtrar array por valor
-        function filterByValue(arr = [], query = '') {
+        function filtrarPorValor(arr = [], query = '') {
             return arr.filter((obj) => {
-                const valuesArray = Object.values(obj);
-                return valuesArray.some((value) =>
-                    String(value).toLowerCase().includes(query.toLowerCase())
+                const valoresArray = Object.values(obj);
+                return valoresArray.some((valor) =>
+                    String(valor).toLowerCase().includes(query.toLowerCase())
                 );
             });
         }
 
         // Verifica se o script foi publicado recentemente
-        function isNewScriptCheck(datePublished) {
-            const dateInMs = Date.now() - datePublished;
-            const oneWeek = 7 * 24 * 60 * 60 * 1000;
-            return dateInMs <= oneWeek;
+        function verificarScriptNovo(dataPublicacao) {
+            const dataMs = Date.now() - dataPublicacao;
+            const umaSemana = 7 * 24 * 60 * 60 * 1000;
+            return dataMs <= umaSemana;
         }
 
         // Fetch: buscar scripts
-        async function fetchScripts() {
-            const data = await twSDK.fetch({
+        async function buscarScripts() {
+            const dados = await twSDK.fetch({
                 host: 'https://twscripts.dev/scripts/scripts.json',
             });
 
-            const result = data.scripts;
-            return result;
+            const resultado = dados.scripts;
+            return resultado;
         }
 
         // Helper: Preparar conteúdo para a UI
-        function prepareContent(scripts) {
-            const categories = [
+        function prepararConteudo(scripts) {
+            const categorias = [
                 {
-                    name: twSDK.tt('NOVO'),
-                    filter: 'new',
+                    name: 'NOVO',
+                    filter: 'novo',
                 },
                 {
-                    name: twSDK.tt('TODOS'),
-                    filter: 'all',
+                    name: 'TODOS',
+                    filter: 'todos',
                 },
             ];
 
-            const content = `
+            const conteudo = `
                 <div class="ra-donate-box">
-                    <strong>${twSDK.tt('Pacote de Scripts do RedAlert')}</strong> v${
+                    <strong>Pacote de Scripts do RedAlert</strong> v${
                 scriptConfig.scriptData.version
             } - por <a href="${
                 scriptConfig.scriptData.authorUrl
             }" target="_blank">${scriptConfig.scriptData.author}</a><br>
-                    ${twSDK.tt(
-                        'Ajude a apoiar o desenvolvimento desses scripts com uma doação:'
-                    )} <strong>PayPal</strong> <a href="https://www.paypal.com/donate/?hosted_button_id=FMACQPPMR59DU" target="_blank" rel="noopener noreferrer">Donar aqui</a><br>
+                    Ajude a apoiar o desenvolvimento desses scripts com uma doação: <strong>PayPal</strong> <a href="https://www.paypal.com/donate/?hosted_button_id=FMACQPPMR59DU" target="_blank" rel="noopener noreferrer">Doar aqui</a><br>
                 </div>
                 <br />
                 <div>
-                    <input id="searchScripts" class="ra-input" type="text" placeholder="${twSDK.tt(
-                        'Pesquisar scripts ...'
-                    )}" />
+                    <input id="pesquisarScripts" class="ra-input" type="text" placeholder="Pesquisar scripts ..." />
                 </div>
                 <div>
-                    ${categories
+                    ${categorias
                         .map(
-                            (category) =>
-                                `<a class="btn btn-confirm-no ra-category-filter" data-category-filter="${category.filter}" href="#">${category.name}</a>`
+                            (categoria) =>
+                                `<a class="btn btn-confirm-no ra-category-filter" data-category-filter="${categoria.filter}" href="#">${categoria.name}</a>`
                         )
                         .join(' ')}
                 </div>
                 <div class="ra-table-container">
                     <table class="vis ra-table">
-                        <tbody id="scriptsList">
-                            ${buildTableRows(scripts)}
+                        <tbody id="listaScripts">
+                            ${construirLinhasTabela(scripts)}
                         </tbody>
                     </table>
                 </div>
                 <br />
-                <span><strong id="raScriptsCount">${scripts.length}</strong> ${twSDK.tt(
-                'scripts listados'
-            )}</span>
+                <span><strong id="raContagemScripts">${scripts.length}</strong> scripts listados</span>
                 <br />
             `;
 
-            return content;
+            return conteudo;
         }
 
         // Helper: Construir linhas da tabela para a lista de scripts
-        function buildTableRows(scripts) {
+        function construirLinhasTabela(scripts) {
             return scripts
                 .map(
                     (script) =>
@@ -338,27 +302,21 @@ $.getScript(
                             <td>
                                 <a class="ra-external-icon-link" href="${
                                     script.forum_url
-                                }" target="_blank" title="${twSDK.tt(
-                            'Ir para o fórum'
-                        )}">${twSDK.tt('Fórum')}</a> | 
+                                }" target="_blank" title="Ir para o fórum">Fórum</a> | 
                                 ${
                                     script.demo_url
-                                        ? `<a class="ra-external-icon-link ra-view-video" href="${
+                                        ? `<a class="ra-external-icon-link ra-ver-video" href="${
                                               script.demo_url
-                                          }" title="${twSDK.tt(
-                                              'Ver vídeo de demonstração'
-                                          )}">${twSDK.tt('Demonstração')}</a>`
-                                        : `${twSDK.tt('Este script não possui vídeo de demonstração!')}`
+                                          }" title="Ver vídeo de demonstração">Demonstração</a>`
+                                        : `Este script não possui vídeo de demonstração!`
                                 }
                             </td>
-                            <td class="ra-script-title" data-camelize="${camelize(
+                            <td class="ra-script-title" data-camelize="${camelizar(
                                 script.title
                             )}">
                                 ${
                                     script.is_new
-                                        ? `<span class="new-script-tag">${twSDK.tt(
-                                              'NOVO'
-                                          )}</span>`
+                                        ? `<span class="new-script-tag">NOVO</span>`
                                         : ''
                                 }
                                 ${script.title}
@@ -369,9 +327,7 @@ $.getScript(
                                 }</textarea>
                             </td>
                             <td>
-                                <a class="btn btn-confirm-yes add-to-quick-bar" href="#" title="${twSDK.tt(
-                                    'Adicionar script na barra rápida'
-                                )}">${twSDK.tt('Adicionar')}</a>
+                                <a class="btn btn-confirm-yes adicionar-barra-rapida" href="#" title="Adicionar script na barra rápida">Adicionar</a>
                             </td>
                         </tr>`
                 )
@@ -379,4 +335,3 @@ $.getScript(
         }
     }
 );
-
