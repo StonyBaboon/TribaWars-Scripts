@@ -9,135 +9,184 @@
 // @grant        none
 // ==/UserScript==
 
-[spoiler=Saqueador de bárbaros]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/4.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3063.png[/img][b]Saqueador de bárbaros[/b]
-Ataques a aldeias de bárbaros viajaram mais rápido em 5%.
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+(function() {
+    'use strict';
 
-[/spoiler]
+    // Função que gera o output baseado nos elementos HTML
+    function gerarOutput() {
+        // Busca todas as linhas da tabela que contêm as fórmulas
+        let formulas = document.querySelectorAll('tr.revealed');
+        let resultados = {};
 
-[spoiler=Sigilia de desespero]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3003.png[/img][b]Sigilia de desespero[/b]
-Apoio enviado enquanto ativo viajará 10% mais rápido. Não terá efeito em comandos já enviados.
-[b]Duração: 48:00:00   [u]Aplicar a: Na aldeia[/u][/b][/**]
-[/table]
+        if (formulas.length === 0) {
+            alert("Nenhuma fórmula encontrada!");
+            return;
+        }
 
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3003.png[/img][b]Sigilia de desespero[/b]
-Apoio enviado enquanto ativo viajará 10% mais rápido. Não terá efeito em comandos já enviados.
-[b]Duração: 48:00:00   [u]Aplicar a: Na aldeia[/u][/b][/**]
-[/table]
+        // Itera por cada fórmula encontrada
+        formulas.forEach((formula) => {
+            let imagens = formula.querySelectorAll('img');
+            if (imagens.length < 4) {
+                console.warn("Fórmula incompleta encontrada, ignorando.");
+                return; // Pula se não houver 4 imagens
+            }
 
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/2.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/2.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3004.png[/img][b]Sigilia de desespero[/b]
-Apoio enviado enquanto ativo viajará 20% mais rápido. Não terá efeito em comandos já enviados.
-[b]Duração: 48:00:00   [u]Aplicar a: Na aldeia[/u][/b][/**]
-[/table]
+            let material1 = imagens[0].src;
+            let material2 = imagens[1].src;
+            let material3 = imagens[2].src;
+            let itemFinal = imagens[3].src;
+            let descricao = imagens[3].getAttribute('data-title');
 
-[/spoiler]
+            if (!descricao) {
+                console.warn("Descrição da fórmula não encontrada, ignorando.");
+                return; // Pula se a descrição não estiver presente
+            }
 
-[spoiler=Trabalhadores efetivos]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3035.png[/img][b]Trabalhadores efetivos[/b]
-Aumenta permanentemente o máximo da produção de madeira, barro e ferro da aldeia atual em 3%
-[b]Duração: Duração desconhecida  [u]Aplicar a: Aplicação desconhecida[/u][/b][/**]
-[/table]
+            try {
+                // Regex para extrair o título e as informações relevantes da descrição
+                let tituloRegex = /<p>(.*?)<\/p>/;
+                let titulo = descricao.match(tituloRegex) ? descricao.match(tituloRegex)[1] : "Título desconhecido";
 
-[/spoiler]
+                let boostRegex = /<p>(.*?)<\/p><p>(.*?)<\/p>/;
+                let boost = descricao.match(boostRegex) ? descricao.match(boostRegex)[2] : "Bônus desconhecido";
 
-[spoiler=Estruturas reforçadas]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/2.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3088.png[/img][b]Estruturas reforçadas[/b]
-Edifícios são 5% mais resistentes a danos de armas de arremesso
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+                let duracaoRegex = /Duração: (.*?)<\/p>/;
+                let duracao = descricao.match(duracaoRegex) ? descricao.match(duracaoRegex)[1] : "Duração desconhecida";
 
-[/spoiler]
+                let aplicarRegex = /Aplicar a: (.*?)<\/p>/;
+                let aplicar = descricao.match(aplicarRegex) ? descricao.match(aplicarRegex)[1] : "Aplicação desconhecida";
 
-[spoiler=Mestre de armas]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/4.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/5.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/5.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3036.png[/img][b]Mestre de armas[/b]
-Aumenta permanentemente a velocidade de recrutamento na Quartel em 10%
-[b]Duração: Duração desconhecida  [u]Aplicar a: Aplicação desconhecida[/u][/b][/**]
-[/table]
+                // Cria o formato da fórmula
+                let formulaTexto = `[table]\n`;
+                formulaTexto += `[**][img]${material1}[/img][||]+[||][img]${material2}[/img][||]+[||][img]${material3}[/img][||]=[||][img]${itemFinal}[/img][b]${titulo}[/b]\n`;
+                formulaTexto += `${boost}\n`;
+                formulaTexto += `[b]Duração: ${duracao}  [u]Aplicar a: ${aplicar}[/u][/b][/**]\n`;
+                formulaTexto += `[/table]\n`;
 
-[/spoiler]
+                // Adiciona o resultado ao objeto 'resultados', agrupando por título
+                if (!resultados[titulo]) {
+                    resultados[titulo] = ''; // Inicializa o título se não existir
+                }
 
-[spoiler=Comandante de Guerra]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/5.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3080.png[/img][b]Comandante de Guerra[/b]
-Todos custos de recrutamento são 5% mais baratos!
-[b]Duração: 72:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+                resultados[titulo] += formulaTexto + '\n';
+            } catch (error) {
+                console.error("Erro ao processar a fórmula: ", error);
+            }
+        });
 
-[/spoiler]
+        // Monta o texto final com os spoilers agrupados
+        let resultadoFinal = '';
+        for (let titulo in resultados) {
+            resultadoFinal += `[spoiler=${titulo}]\n`;
+            resultadoFinal += resultados[titulo];
+            resultadoFinal += `[/spoiler]\n\n`;
+        }
 
-[spoiler=Discurso extravagante]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/6.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3025.png[/img][b]Discurso extravagante[/b]
-Por cada nobre produzido, enquanto ativo o item, receberás um item de pacote de recursos no valor de 50% do custo de produção da unidade. Este item pode ser usado em qualquer aldeia.
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        return resultadoFinal;
+    }
 
-[/spoiler]
+    // Função para criar a caixa de texto flutuante
+    function criarCaixaTexto(resultado) {
+        let caixaTexto = document.createElement('textarea');
+        caixaTexto.value = resultado;
+        caixaTexto.style.position = 'fixed';
+        caixaTexto.style.top = '100px';
+        caixaTexto.style.right = '20px';
+        caixaTexto.style.width = '400px';
+        caixaTexto.style.height = '300px';
+        caixaTexto.style.zIndex = '1000';
+        caixaTexto.style.padding = '10px';
+        caixaTexto.style.border = '1px solid #ccc';
+        caixaTexto.style.backgroundColor = '#f8f8f8';
+        caixaTexto.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.2)';
+        caixaTexto.style.fontSize = '14px';
+        caixaTexto.style.color = '#333';
+        caixaTexto.style.resize = 'none';  // Desativa o redimensionamento manual da caixa de texto
+        caixaTexto.id = 'resultadoConversao';
 
-[spoiler=Bónus de estábulo]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/4.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/5.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3072.png[/img][b]Bónus de estábulo[/b]
-Todas velocidade de recrutamento em Estábulo são 10% mais rápidos!
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        let fecharBotao = document.createElement('button');
+        fecharBotao.innerText = 'Fechar';
+        fecharBotao.style.position = 'absolute';
+        fecharBotao.style.bottom = '10px';
+        fecharBotao.style.right = '10px';
+        fecharBotao.style.padding = '5px 10px';
+        fecharBotao.style.backgroundColor = '#d9534f';
+        fecharBotao.style.color = '#fff';
+        fecharBotao.style.border = 'none';
+        fecharBotao.style.cursor = 'pointer';
+        fecharBotao.onclick = () => {
+            document.body.removeChild(caixaTexto);
+        };
 
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/4.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/4.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3071.png[/img][b]Bónus de estábulo[/b]
-Todas velocidade de recrutamento em Estábulo são 5% mais rápidos!
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        document.body.appendChild(caixaTexto);
+        caixaTexto.appendChild(fecharBotao);
+    }
 
-[/spoiler]
+    // Função principal que é ativada ao clicar no botão
+    function converterFormulas() {
+        let resultado = gerarOutput();
+        if (resultado) {
+            criarCaixaTexto(resultado);
+        }
+    }
 
-[spoiler=Booster de machado]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/5.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3011.png[/img][b]Booster de machado[/b]
-Viking: +10% poder de defesa e ofensivo
-[b]Duração: 48:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+    // Função para criar o botão
+    function criarBotao() {
+        let headerLeftDiv = document.querySelector('.header-left');
+        if (!headerLeftDiv) return;
 
-[/spoiler]
+        // Verifica se o botão já foi criado para evitar duplicatas
+        if (document.querySelector('#botaoConversor')) return;
 
-[spoiler=Booster de dano da catapulta]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/1.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/2.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3066.png[/img][b]Booster de dano da catapulta[/b]
-Catapulta: +25% Dano contra edifícios
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        let botao = document.createElement('button');
+        botao.innerText = 'Converter Fórmulas';
+        botao.id = 'botaoConversor'; // Adiciona um ID para referência futura
+        botao.className = 'btn';  // Usa a classe 'btn' para seguir o estilo dos botões da página
+        botao.style.marginTop = '10px';
+        botao.style.padding = '8px 12px';
+        botao.style.backgroundColor = '#4CAF50';
+        botao.style.color = '#fff';
+        botao.style.border = 'none';
+        botao.style.cursor = 'pointer';
+        botao.style.fontSize = '14px';
 
-[/spoiler]
+        // Adiciona a funcionalidade ao botão
+        botao.addEventListener('click', converterFormulas);
 
-[spoiler=Booster de defensor]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/2.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/6.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3018.png[/img][b]Booster de defensor[/b]
-Lanceiro: +5% poder de defesa<br />Espadachim: +5% poder de defesa
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        // Insere o botão no final do div .header-left
+        headerLeftDiv.appendChild(botao);
+    }
 
-[/spoiler]
+    // Função para garantir que o botão seja inserido após o carregamento da página
+    function adicionarBotaoComObservador() {
+        // Verifica se o botão já existe, e se não existir, tenta adicionar
+        criarBotao();
 
-[spoiler=Booster de atacante]
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/3.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/7.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3017.png[/img][b]Booster de atacante[/b]
-Viking: +15% poder do atacante<br />Cavalaria leve: +15% poder do atacante
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        // Observa mudanças no DOM para reinserir o botão, caso ele seja removido
+        const observer = new MutationObserver((mutationsList, observer) => {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList' || mutation.type === 'subtree') {
+                    criarBotao();
+                }
+            }
+        });
 
-[table]
-[**][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/2.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/4.png[/img][||]+[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/events/crafting/material_icon/5.png[/img][||]=[||][img]https://dspt.innogamescdn.com/asset/a9f5605f/graphic/items/3016.png[/img][b]Booster de atacante[/b]
-Viking: +5% poder do atacante<br />Cavalaria leve: +5% poder do atacante
-[b]Duração: 24:00:00   [u]Aplicar a: Em todas as aldeias[/u][/b][/**]
-[/table]
+        // Configura o observador para observar a 'header-left' e alterações no body
+        let targetNode = document.body;
+        let config = { childList: true, subtree: true };
 
-[/spoiler]
+        observer.observe(targetNode, config);
+    }
 
+    // Verifica a cada segundo se o botão está presente e o adiciona, se necessário
+    let intervaloVerificacao = setInterval(() => {
+        criarBotao();
+    }, 1000);
+
+    // Adiciona o botão após o carregamento completo da página
+    window.addEventListener('load', () => {
+        adicionarBotaoComObservador();
+        clearInterval(intervaloVerificacao);
+    });
+
+})();
