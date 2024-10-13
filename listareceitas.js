@@ -2,7 +2,7 @@
 // @name         Lista de Receitas
 // @namespace    http://tampermonkey.net/
 // @version      1.5
-// @description  Gera alista de formulas numa tabela em codigo BB
+// @description  Gera lista de receitas do evento "Bigorna do Rei Mercenário" em codigo BB para partilhar no forum.
 // @author       StonyBaboon
 // @match        https://*.tribalwars.com.pt/game.php?*screen=event_crafting&mode=recipe_book*
 // @download     https://github.com/StonyBaboon/TribaWars-Scripts/edit/main/listareceitas.js
